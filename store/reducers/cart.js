@@ -1,6 +1,6 @@
 import { ADD_TO_CART, REMOVE_FROM_CART } from '../actions/cart';
 import { ADD_ORDER } from '../actions/orders';
-import { DELETE_PRODUCT } from '../actions/products';
+import { DELETE_PRODUCT } from '../actions/events';
 import CartItem from '../../models/cart-item';
 
 const initialState = {

@@ -1,5 +1,5 @@
 import { AsyncStorage } from 'react-native';
-const API_KEY = 'AIzaSyB7A0YodCgm6OxVnGK0tH71s1W42ZogEWc';
+const API_KEY = 'AIzaSyCJTn2PdoaO5MnBvZDCoNXmOI7MzsNrMVE';
 
 export const AUTHENTICATE = 'AUTHENTICATE';
 export const LOG_OUT = 'LOG_OUT';

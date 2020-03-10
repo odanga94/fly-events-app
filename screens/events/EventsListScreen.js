@@ -9,28 +9,28 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
-import ProductItem from '../../components/shop/ProductItem';
+import EventItem from '../../components/events/EventItem';
 import * as cartActions from '../../store/actions/cart';
 import HeaderButton from '../../components/UI/HeaderButton';
 import Colors from '../../constants/Colors';
-import * as productActions from '../../store/actions/products';
+import * as eventActions from '../../store/actions/events';
 import Spinner from '../../components/UI/Spinner';
 import ErrorMessage from '../../components/ErrorMessage';
 
-const ProductsOverviewScreen = props => {
+const EventsListScreen = props => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
-  const products = useSelector(state => {
-    return state.products.availableProducts
+  const events = useSelector(state => {
+    return state.events.upComingEvents
   });
   const dispatch = useDispatch();
 
-  const loadProducts = useCallback(async () => {
+  const loadEvents = useCallback(async () => {
     //console.log('LOAD PRODUCTS');
     setError(null);
     //setIsLoading(true);
     try {
-      await dispatch(productActions.fetchProducts());
+      await dispatch(eventActions.fetchEvents());
     } catch (err) {
       setError(err.message);
     }
@@ -38,17 +38,17 @@ const ProductsOverviewScreen = props => {
   }, [dispatch, setIsLoading, setError]);
 
   useEffect(() => {
-    loadProducts();
-  }, [dispatch, loadProducts]);
+    loadEvents();
+  }, [dispatch, loadEvents]);
 
   useEffect(() => {
     const WillFocusSub = props.navigation.addListener('willFocus', () => {
-      loadProducts();
+      loadEvents();
     });
     return () => {
       WillFocusSub.remove();
     }
-  }, [loadProducts]);
+  }, [loadEvents]);
 
   const selectItemHandler = (id, title) => {
     props.navigation.navigate('ProductDetail', { productId: id, productTitle: title });
@@ -64,30 +64,31 @@ const ProductsOverviewScreen = props => {
     return (
       <ErrorMessage
         error={error}
-        retry={loadProducts}
+        retry={loadEvents}
       />
     )
   }
 
-  if (!isLoading && products.length === 0) {
+  if (!isLoading && events.length === 0) {
     return (
       <View style={styles.centered}>
-        <Text style={{ fontFamily: 'open-sans-bold', fontSize: 18, textAlign: 'center' }}>No products found! Maybe start adding some.</Text>
+        <Text style={{ fontFamily: 'open-sans-bold', fontSize: 18, textAlign: 'center' }}>No events found! Maybe start adding some.</Text>
       </View>
     )
   }
 
   return (
     <FlatList
-      onRefresh={loadProducts}
+      onRefresh={loadEvents}
       refreshing={isLoading}
-      data={products}
+      data={events}
       keyExtractor={item => item.id}
       renderItem={itemData => (
-        <ProductItem
-          image={itemData.item.imageUrl}
+        <EventItem
+          image={itemData.item.imageUri}
           title={itemData.item.title}
           price={itemData.item.price}
+          date={itemData.item.readableDate}
           onSelect={() => {
             selectItemHandler(itemData.item.id, itemData.item.title);
           }}
@@ -100,21 +101,21 @@ const ProductsOverviewScreen = props => {
             color={Colors.primary}
           />
           <Button
-            title="To Cart"
+            title="BUY TICKET"
             onPress={() => {
               dispatch(cartActions.addToCart(itemData.item));
             }}
-            color={Colors.primary}
+            color={Colors.accent}
           />
-        </ProductItem>
+        </EventItem>
       )}
     />
   );
 };
 
-ProductsOverviewScreen.navigationOptions = navData => {
+EventsListScreen.navigationOptions = navData => {
   return {
-    headerTitle: 'All Products',
+    headerTitle: 'UpComing Events',
     headerLeft: (
       <HeaderButtons HeaderButtonComponent={HeaderButton} >
         <Item
@@ -151,4 +152,4 @@ const styles = StyleSheet.create({
 
 
 
-export default ProductsOverviewScreen;
+export default EventsListScreen;

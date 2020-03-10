@@ -1,16 +1,16 @@
 import { BASE_URL } from '../../constants/base-url';
-import Product from '../../models/product';
+import Event from '../../models/event';
 
-export const DELETE_PRODUCT = "DELETE_PRODUCT";
-export const CREATE_PRODUCT = "CREATE_PRODUCT";
-export const UPDATE_PRODUCT = "UPDATE_PRODUCT";
-export const SET_PRODUCTS = "SET_PRODUCTS";
+export const DELETE_EVENT = "DELETE_EVENT";
+export const CREATE_EVENT = "CREATE_EVENT";
+export const UPDATE_EVENT = "UPDATE_EVENT";
+export const SET_EVENTS = "SET_EVENTS";
 
-export const fetchProducts = () => {
+export const fetchEvents = () => {
     return async (dispatch, getState) => {
         const userId = getState().auth.userId;
         try {
-            const response = await fetch(`${BASE_URL}products.json`);
+            const response = await fetch(`${BASE_URL}events.json`);
 
             if (!response.ok){
                 //console.log(response);
@@ -18,21 +18,23 @@ export const fetchProducts = () => {
             }
             const resData = await response.json();
             //console.log(resData);
-            const loadedProducts = resData ? Object.keys(resData).map(key => {
-                return new Product(
+            const loadedEvents = resData ? Object.keys(resData).map(key => {
+                return new Event(
                     key,
                     resData[key].ownerId,
                     resData[key].title,
-                    resData[key].imageUrl,
                     resData[key].description,
-                    resData[key].price
+                    resData[key].imageUri,
+                    resData[key].price,
+                    resData[key].eventDate
                 );
             }) : [];
+            loadedEvents.sort((a, b) => a.eventDate > b.eventDate ? 1 : -1)
             //console.log(loadedProducts);
             dispatch({
-                type: SET_PRODUCTS,
-                products: loadedProducts,
-                userProducts: loadedProducts.filter(prod => prod.ownerId === userId)
+                type: SET_EVENTS,
+                events: loadedEvents,
+                userEvents: loadedEvents.filter(event => event.ownerId === userId)
             })
         } catch (err) {
             // send to custom analytics server
@@ -53,17 +55,17 @@ export const deleteProduct = (productId) => {
         }
 
         dispatch({
-            type: DELETE_PRODUCT,
+            type: DELETE_EVENT,
             pid: productId
         });
     }
 }
 
-export const createProduct = (title, description, imageUrl, price) => {
+export const createEvent = (title, description, imageUri, price, date) => {
     return async (dispatch, getState) => {
         // any async code you want!
         const { token, userId } = getState().auth;
-        const response = await fetch(`${BASE_URL}products.json/?auth=${token}`, {
+        const response = await fetch(`${BASE_URL}events.json/?auth=${token}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -71,9 +73,10 @@ export const createProduct = (title, description, imageUrl, price) => {
             body: JSON.stringify({
                 title,
                 description,
-                imageUrl,
+                imageUri,
                 price,
-                ownerId: userId
+                ownerId: userId,
+                eventDate: date
             })
         });
 
@@ -81,14 +84,15 @@ export const createProduct = (title, description, imageUrl, price) => {
         //console.log(resData);
 
         dispatch({
-            type: CREATE_PRODUCT,
-            productData: {
+            type: CREATE_EVENT,
+            eventData: {
                 id: resData.name,
                 title,
                 description,
-                imageUrl,
+                imageUri,
                 price,
-                ownerId: userId
+                ownerId: userId,
+                date
             }
         });
     }
@@ -116,7 +120,7 @@ export const updateProduct = (id, title, description, imageUrl) => {
         }
 
         dispatch({
-            type: UPDATE_PRODUCT,
+            type: UPDATE_EVENT,
             pid: id,
             productData: {
                 title,

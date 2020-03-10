@@ -1,16 +1,18 @@
-import React, { 
-    useReducer, 
-    useCallback, 
+import React, {
+    useReducer,
+    useCallback,
     useState,
     useEffect
 } from 'react';
-import { 
-    ScrollView, 
-    StyleSheet, 
-    KeyboardAvoidingView, 
-    View, 
+import {
+    ScrollView,
+    StyleSheet,
+    KeyboardAvoidingView,
+    View,
     Button,
-    Alert 
+    Alert,
+    Image,
+    Dimensions
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -21,8 +23,7 @@ import Colors from '../../constants/Colors';
 import * as authActions from '../../store/actions/auth';
 import Spinner from '../../components/UI/Spinner';
 
-
-
+const { height } = Dimensions.get('window');
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 const formReducer = (state, action) => {
     if (action.type === FORM_INPUT_UPDATE) {
@@ -66,8 +67,8 @@ const AuthScreen = props => {
     });
 
     useEffect(() => {
-        if (error){
-            Alert.alert('An error occurred!', error, [{ text: 'Okay'}]);
+        if (error) {
+            Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
         }
     }, [error]);
 
@@ -76,7 +77,7 @@ const AuthScreen = props => {
         setError(null);
         try {
             await dispatch(authActions.signUp(formState.inputValues.email, formState.inputValues.password));
-            props.navigation.navigate('Shop');
+            props.navigation.navigate('Events');
         } catch (err) {
             setError(err.message);
             setIsLoading(false);
@@ -88,7 +89,7 @@ const AuthScreen = props => {
         setError(null);
         try {
             await dispatch(authActions.logIn(formState.inputValues.email, formState.inputValues.password));
-            props.navigation.navigate('Shop');
+            props.navigation.navigate('Events');
         } catch (err) {
             setError(err.message)
             setIsLoading(false);
@@ -106,11 +107,18 @@ const AuthScreen = props => {
 
     return (
         <KeyboardAvoidingView
-            behavior="padding"
-            keyboardVerticalOffset={50}
+            behavior="position"
+            keyboardVerticalOffset={5}
             style={styles.screen}
         >
-            <LinearGradient colors={['#ffedff', '#ffe3ff']} style={styles.gradient}>
+            <LinearGradient colors={['#ccc', 'white']} style={styles.gradient}>
+                <View style={styles.imageContainer}>
+                    <Image
+                        source={require('../../assets/company-logo.png')}
+                        style={{ width: '100%', height: height / 4 }}
+                        resizeMode="contain"
+                    />
+                </View>
                 <Card style={styles.authContainer}>
                     <ScrollView>
                         <Input
@@ -172,7 +180,7 @@ const styles = StyleSheet.create({
     gradient: {
         width: '100%',
         height: '100%',
-        justifyContent: "center",
+        paddingTop: 50,
         alignItems: "center"
     },
     authContainer: {
@@ -183,6 +191,9 @@ const styles = StyleSheet.create({
     },
     buttonContainer: {
         marginTop: 15,
+    },
+    imageContainer: {
+        width: '80%'
     }
 });
 

@@ -3,13 +3,13 @@ import { View, Text, FlatList, Button, Alert } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 
-import ProductItem from '../../components/shop/ProductItem';
+import EventItem from '../../components/events/EventItem';
 import HeaderButton from '../../components/UI/HeaderButton';
 import Colors from '../../constants/Colors';
-import { deleteProduct } from '../../store/actions/products'
+import { deleteProduct } from '../../store/actions/events'
 
-const UserProductsScreen = props => {
-    const userProducts = useSelector(state => state.products.userProducts);
+const UserEventsScreen = props => {
+    const userEvents = useSelector(state => state.events.userEvents);
     const dispatch = useDispatch();
 
     const editProductHandler = (productId) => {
@@ -25,23 +25,24 @@ const UserProductsScreen = props => {
         ])
     }
 
-    if (userProducts.length === 0){
+    if (userEvents.length === 0){
         return (
             <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-                <Text style={{fontFamily: 'open-sans-bold'}}>No products found. Maybe start adding some.</Text>
+                <Text style={{fontFamily: 'open-sans-bold', textAlign: "center", marginHorizontal: 5}}>You haven't added any event. Maybe start adding some.</Text>
             </View>
         )
     }
 
     return (
         <FlatList
-            data={userProducts}
+            data={userEvents}
             keyExtractor={item => item.id}
             renderItem={itemData => (
-                <ProductItem
+                <EventItem
                     title={itemData.item.title}
                     price={itemData.item.price}
-                    image={itemData.item.imageUrl}
+                    image={itemData.item.imageUri}
+                    date={itemData.item.readableDate}
                     onSelect={() => {
                         editProductHandler(itemData.item.id);
                     }}
@@ -60,15 +61,15 @@ const UserProductsScreen = props => {
                         }}
                         color={Colors.primary}
                     />
-                </ProductItem>
+                </EventItem>
             )}
         />
     );
 }
 
-UserProductsScreen.navigationOptions = navData => {
+UserEventsScreen.navigationOptions = navData => {
     return {
-        headerTitle: 'My Products',
+        headerTitle: 'My Events',
         headerLeft: (
             <HeaderButtons HeaderButtonComponent={HeaderButton} >
                 <Item
@@ -86,7 +87,7 @@ UserProductsScreen.navigationOptions = navData => {
                     title='Add'
                     iconName='ios-create'
                     onPress={() => {
-                        navData.navigation.navigate('EditProduct');
+                        navData.navigation.navigate('EditEvent');
                     }}
                 />
             </HeaderButtons>
@@ -94,4 +95,4 @@ UserProductsScreen.navigationOptions = navData => {
     }
 }
 
-export default UserProductsScreen;
+export default UserEventsScreen;

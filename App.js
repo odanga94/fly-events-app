@@ -6,14 +6,14 @@ import * as Font from 'expo-font';
 import { composeWithDevTools } from 'redux-devtools-extension';
 import ReduxThunk from 'redux-thunk';
 
-import productsReducer from './store/reducers/products';
+import eventsReducer from './store/reducers/events';
 import cartReducer from './store/reducers/cart';
 import ordersReducer from './store/reducers/orders';
 import authReducer from './store/reducers/auth';
 import NavigationWrapper from './navigation/NavigationWrapper';
 
 const rootReducer = combineReducers({
-  products: productsReducer,
+  events: eventsReducer,
   cart: cartReducer,
   orders: ordersReducer,
   auth: authReducer

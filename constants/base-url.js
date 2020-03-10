@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://meals-app-58cf3.firebaseio.com/';
+export const BASE_URL = 'https://fly-events-app.firebaseio.com/';

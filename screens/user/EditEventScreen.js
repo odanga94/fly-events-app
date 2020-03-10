@@ -9,16 +9,19 @@ import {
     ScrollView,
     StyleSheet,
     Alert,
-    KeyboardAvoidingView
+    KeyboardAvoidingView,
+    Text
 } from 'react-native';
+import { DatePicker } from 'native-base';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import { useSelector, useDispatch } from 'react-redux';
 
 import HeaderButton from '../../components/UI/HeaderButton';
-import * as productActions from '../../store/actions/products';
+import * as eventActions from '../../store/actions/events';
 import Input from '../../components/UI/Input';
 import Spinner from '../../components/UI/Spinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import Colors from '../../constants/Colors';
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 const formReducer = (state, action) => {
@@ -44,26 +47,29 @@ const formReducer = (state, action) => {
     return state;
 }
 
-const EditProductScreen = props => {
+const EditEventScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const prodId = props.navigation.getParam('productId');
-    const editedProduct = useSelector(state => state.products.userProducts.find(prod => prod.id === prodId));
+    const editingEvent = /*useSelector(state => state.products.userEvents.find(prod => prod.id === prodId));*/ null;
 
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
-            title: editedProduct ? editedProduct.title : '',
-            imageUrl: editedProduct ? editedProduct.imageUrl : '',
+            title: editingEvent ? editingEvent.title : '',
+            imageUrl: editingEvent ? editingEvent.imageUrl : '',
             price: '',
-            description: editedProduct ? editedProduct.description : ''
+            description: editingEvent ? editingEvent.description : '',
+            date: editingEvent ? editingEvent.date : ''
         },
         inputValidities: {
-            title: editedProduct ? true : false,
-            imageUrl: editedProduct ? true : false,
-            price: editedProduct ? true : false,
-            description: editedProduct ? true : false
+            title: editingEvent ? true : false,
+            imageUrl: editingEvent ? true : false,
+            price: editingEvent ? true : false,
+            description: editingEvent ? true : false,
+            date: editingEvent ? true : false
+
         },
-        formIsValid: editedProduct ? true : false
+        formIsValid: editingEvent ? true : false
     });
 
     const dispatch = useDispatch();
@@ -77,20 +83,21 @@ const EditProductScreen = props => {
         setError(null);
         setIsLoading(true);
         try {
-            editedProduct ?
+            editingEvent ?
                 await dispatch(
-                    productActions.updateProduct(
+                    eventActions.updateEvent(
                         prodId,
                         formState.inputValues.title,
                         formState.inputValues.description,
                         formState.inputValues.imageUrl
                     )) :
                 await dispatch(
-                    productActions.createProduct(
+                    eventActions.createEvent(
                         formState.inputValues.title,
                         formState.inputValues.description,
                         formState.inputValues.imageUrl,
-                        +formState.inputValues.price
+                        +formState.inputValues.price,
+                        formState.inputValues.date,
                     ));
             props.navigation.goBack();
         } catch (err) {
@@ -111,6 +118,7 @@ const EditProductScreen = props => {
             inputLabel
         })
     }, [dispatchFormState]);
+
 
     if (isLoading) {
         return <Spinner />
@@ -136,8 +144,8 @@ const EditProductScreen = props => {
                         autoCapitalize='sentences'
                         returnKeyType='next'
                         onInputChange={inputChangeHandler}
-                        initialValue={editedProduct ? editedProduct.title : ''}
-                        initiallyValid={!!editedProduct}
+                        initialValue={editingEvent ? editingEvent.title : ''}
+                        initiallyValid={!!editingEvent}
                         required
                     />
                     <Input
@@ -147,23 +155,21 @@ const EditProductScreen = props => {
                         autoCapitalize='sentences'
                         returnKeyType='next'
                         onInputChange={inputChangeHandler}
-                        initialValue={editedProduct ? editedProduct.imageUrl : ''}
-                        initiallyValid={!!editedProduct}
+                        initialValue={editingEvent ? editingEvent.imageUrl : ''}
+                        initiallyValid={!!editingEvent}
                         required
                     />
-                    {editedProduct ? null :
-                        <Input
-                            id="price"
-                            label='Price'
-                            errorText='Please enter a numeric value.'
-                            autoCapitalize='sentences'
-                            returnKeyType='next'
-                            keyboardType='decimal-pad'
-                            onInputChange={inputChangeHandler}
-                            required
-                            min={0.1}
-                        />
-                    }
+                    <Input
+                        id="price"
+                        label='Price'
+                        errorText='Please enter a numeric value.'
+                        autoCapitalize='sentences'
+                        returnKeyType='next'
+                        keyboardType='decimal-pad'
+                        onInputChange={inputChangeHandler}
+                        required
+                        min={0.1}
+                    />
                     <Input
                         id="description"
                         label='Description'
@@ -173,10 +179,28 @@ const EditProductScreen = props => {
                         multiline
                         numberOfLines={3}
                         onInputChange={inputChangeHandler}
-                        initialValue={editedProduct ? editedProduct.description : ''}
-                        initiallyValid={!!editedProduct}
+                        initialValue={editingEvent ? editingEvent.description : ''}
+                        initiallyValid={!!editingEvent}
                         required
                         minLength={5}
+                    />
+                    <Text style={styles.label}>Date:</Text>
+                    <DatePicker
+                        defaultDate={new Date()}
+                        minimumDate={new Date()}
+                        maximumDate={new Date(2020, 12, 31)}
+                        locale={"en"}
+                        timeZoneOffsetInMinutes={undefined}
+                        modalTransparent={false}
+                        animationType={"fade"}
+                        androidMode={"default"}
+                        placeHolderText="Select date"
+                        textStyle={{ color: Colors.accent }}
+                        placeHolderTextStyle={{ color: "#505050" }}
+                        onDateChange={(newDate) => {
+                            inputChangeHandler("date", newDate, true)
+                        }}
+                        disabled={false}
                     />
                 </View>
             </ScrollView>
@@ -185,10 +209,10 @@ const EditProductScreen = props => {
 
 }
 
-EditProductScreen.navigationOptions = navData => {
+EditEventScreen.navigationOptions = navData => {
     const submitFn = navData.navigation.getParam('submit');
     return {
-        headerTitle: navData.navigation.getParam('productId') ? 'Edit Product' : 'Add Product',
+        headerTitle: navData.navigation.getParam('productId') ? 'Edit Event' : 'Add Event',
         headerRight: (
             <HeaderButtons HeaderButtonComponent={HeaderButton} >
                 <Item
@@ -206,7 +230,11 @@ EditProductScreen.navigationOptions = navData => {
 const styles = StyleSheet.create({
     form: {
         margin: 20
-    }
+    },
+    label: {
+        fontFamily: 'open-sans-bold',
+        marginVertical: 8
+    },
 });
 
-export default EditProductScreen;
+export default EditEventScreen;

@@ -1,41 +1,41 @@
-import PRODUCTS from '../../data/dummy-data';
-import Product from '../../models/product';
-import { DELETE_PRODUCT, CREATE_PRODUCT, UPDATE_PRODUCT, SET_PRODUCTS } from '../actions/products';
+import Event from '../../models/event';
+import { CREATE_EVENT, SET_EVENTS } from '../actions/events';
 
 const initialState = {
-    availableProducts: [],
-    userProducts: []
+    upComingEvents: [],
+    userEvents: []
 };
 
 export default (state = initialState, action) => {
     switch (action.type){
-        case SET_PRODUCTS: 
+        case SET_EVENTS: 
             return {
                 ...state,
-                availableProducts: action.products,
-                userProducts: action.userProducts
+                upComingEvents: action.events,
+                userEvents: action.userEvents
             }
-        case DELETE_PRODUCT:
+        /*case DELETE_PRODUCT:
             return {
                 ...state,
                 availableProducts: state.availableProducts.filter(availableProduct => availableProduct.id !== action.pid),
                 userProducts: state.userProducts.filter(userProduct => userProduct.id !== action.pid)
-            }
-        case CREATE_PRODUCT:
-            const newProduct = new Product(
-                action.productData.id,
-                action.productData.ownerId,
-                action.productData.title,
-                action.productData.imageUrl,
-                action.productData.description,
-                action.productData.price
+            }*/
+        case CREATE_EVENT:
+            const newEvent = new Event(
+                action.eventData.id,
+                action.eventData.ownerId,
+                action.eventData.title,
+                action.eventData.description,
+                action.eventData.imageUri,
+                action.eventData.price,
+                action.eventData.date
             )
             return {
                 ...state,
-                availableProducts: state.availableProducts.concat(newProduct),
-                userProducts: state.userProducts.concat(newProduct)
+                upComingEvents: state.upComingEvents.concat(newEvent),
+                userEvents: state.userEvents.concat(newEvent)
             }
-        case UPDATE_PRODUCT: 
+        /*case UPDATE_PRODUCT: 
             const prodIndex = state.userProducts.findIndex(prod => prod.id === action.pid);
             const updatedProduct = new Product(
                 action.pid, 
@@ -54,7 +54,7 @@ export default (state = initialState, action) => {
                 ...state,
                 availableProducts: updatedAvailableProducts,
                 userProducts: updatedUserProducts
-            }
+            }*/
         default: 
             return state;
     }

@@ -10,12 +10,12 @@ import { Platform, SafeAreaView, Button, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
-import ProductsOverviewScreen from '../screens/shop/ProductsOverviewScreen';
-import ProductDetailScreen from '../screens/shop/ProductDetailScreen';
-import CartScreen from '../screens/shop/CartScreen';
-import OrdersScreen from '../screens/shop/OrdersScreen';
-import UserProductsScreen from '../screens/user/UserProductsScreen';
-import EditProductScreen from '../screens/user/EditProductScreen';
+import EventsListScreen from '../screens/events/EventsListScreen';
+import ProductDetailScreen from '../screens/events/ProductDetailScreen';
+import CartScreen from '../screens/events/CartScreen';
+import OrdersScreen from '../screens/events/OrdersScreen';
+import UserEventsScreen from '../screens/user/UserEventsScreen';
+import EditEventScreen from '../screens/user/EditEventScreen';
 import AuthScreen from '../screens/user/AuthScreen';
 import StartUpScreen from '../screens/StartUpScreen';
 import Colors from '../constants/Colors';
@@ -34,9 +34,9 @@ const defaultNavOptions = {
   }
 }
 
-const ProductsNavigator = createStackNavigator(
+const EventsStackNavigator = createStackNavigator(
   {
-    ProductsOverview: ProductsOverviewScreen,
+    EventsOverview: EventsListScreen,
     ProductDetail: ProductDetailScreen,
     Cart: CartScreen
   },
@@ -62,8 +62,8 @@ const OrdersNavigator = createStackNavigator(
 
 const AdminNavigator = createStackNavigator(
   {
-    UserProducts: UserProductsScreen,
-    EditProduct: EditProductScreen
+    UserEvents: UserEventsScreen,
+    EditEvent: EditEventScreen
   },
   {
     navigationOptions: {
@@ -73,9 +73,9 @@ const AdminNavigator = createStackNavigator(
   }
 );
 
-const ShopNavigator = createDrawerNavigator(
+const EventsDrawerNavigator = createDrawerNavigator(
   {
-    Products: ProductsNavigator,
+    Events: EventsStackNavigator,
     Orders: OrdersNavigator,
     Admin: AdminNavigator
   },
@@ -109,7 +109,7 @@ const AuthNavigator = createStackNavigator({
 const MainNavigator = createSwitchNavigator({
   StartUp: StartUpScreen,
   Auth: AuthNavigator,
-  Shop: ShopNavigator
+  Events: EventsDrawerNavigator
 });
 
 export default createAppContainer(MainNavigator);
