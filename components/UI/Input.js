@@ -89,11 +89,11 @@ const styles = StyleSheet.create({
     },
     label: {
         fontFamily: 'open-sans-bold',
-        marginVertical: 8
+        marginTop: 8,
     },
     input: {
         paddingHorizontal: 2,
-        paddingVertical: 5,
+        paddingVertical: 2,
         borderBottomColor: '#ccc',
         borderBottomWidth: 1,
         fontFamily: 'open-sans'

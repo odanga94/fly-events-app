@@ -26,7 +26,8 @@ export const fetchEvents = () => {
                     resData[key].description,
                     resData[key].imageUri,
                     resData[key].price,
-                    resData[key].eventDate
+                    resData[key].eventDate,
+                    resData[key].eventTime
                 );
             }) : [];
             loadedEvents.sort((a, b) => a.eventDate > b.eventDate ? 1 : -1)
@@ -61,7 +62,7 @@ export const deleteProduct = (productId) => {
     }
 }
 
-export const createEvent = (title, description, imageUri, price, date) => {
+export const createEvent = (title, description, imageUri, price, date, eventTime) => {
     return async (dispatch, getState) => {
         // any async code you want!
         const { token, userId } = getState().auth;
@@ -76,7 +77,8 @@ export const createEvent = (title, description, imageUri, price, date) => {
                 imageUri,
                 price,
                 ownerId: userId,
-                eventDate: date
+                eventDate: date,
+                eventTime
             })
         });
 
@@ -92,7 +94,8 @@ export const createEvent = (title, description, imageUri, price, date) => {
                 imageUri,
                 price,
                 ownerId: userId,
-                date
+                date,
+                eventTime
             }
         });
     }

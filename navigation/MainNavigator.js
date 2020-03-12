@@ -11,7 +11,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useDispatch } from 'react-redux';
 
 import EventsListScreen from '../screens/events/EventsListScreen';
-import ProductDetailScreen from '../screens/events/ProductDetailScreen';
+import EventDetailsScreen from '../screens/events/EventDetailsScreen';
 import CartScreen from '../screens/events/CartScreen';
 import OrdersScreen from '../screens/events/OrdersScreen';
 import UserEventsScreen from '../screens/user/UserEventsScreen';
@@ -37,7 +37,7 @@ const defaultNavOptions = {
 const EventsStackNavigator = createStackNavigator(
   {
     EventsOverview: EventsListScreen,
-    ProductDetail: ProductDetailScreen,
+    EventDetails: EventDetailsScreen,
     Cart: CartScreen
   },
   {
@@ -60,7 +60,7 @@ const OrdersNavigator = createStackNavigator(
   }
 );
 
-const AdminNavigator = createStackNavigator(
+const MyEventsNavigator = createStackNavigator(
   {
     UserEvents: UserEventsScreen,
     EditEvent: EditEventScreen
@@ -77,7 +77,7 @@ const EventsDrawerNavigator = createDrawerNavigator(
   {
     Events: EventsStackNavigator,
     Orders: OrdersNavigator,
-    Admin: AdminNavigator
+    'My Events': MyEventsNavigator
   },
   {
     contentOptions: {

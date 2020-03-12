@@ -1,4 +1,6 @@
 import { AsyncStorage } from 'react-native';
+
+import { BASE_URL } from '../../constants/base-url';
 const API_KEY = 'AIzaSyCJTn2PdoaO5MnBvZDCoNXmOI7MzsNrMVE';
 
 export const AUTHENTICATE = 'AUTHENTICATE';
@@ -25,7 +27,7 @@ export const authenticate = (userId, token, expiryTime) => {
     }
 }
 
-export const signUp = (email, password) => {
+export const signUp = (email, password, userName) => {
     return async dispatch => {
         const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`, {
             method: 'POST',
@@ -54,6 +56,19 @@ export const signUp = (email, password) => {
         }
 
         const resData = await response.json();
+        try {
+            await fetch(`${BASE_URL}users/${resData.localId}.json/?auth=${resData.idToken}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userName
+                })
+            });
+        } catch (err) {
+            throw new Error('Something went wrong updating your user name but you can still log in with your email and password');
+        }
         //console.log(resData);
         dispatch(authenticate(resData.localId, resData.idToken, parseInt(resData.expiresIn) * 1000));
         const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);
@@ -87,6 +102,7 @@ export const logIn = (email, password) => {
         }
 
         const resData = await response.json();
+        const postUserName = 
         //console.log(resData);
         dispatch(authenticate(resData.localId, resData.idToken, parseInt(resData.expiresIn) * 1000));
         const expirationDate = new Date(new Date().getTime() + parseInt(resData.expiresIn) * 1000);

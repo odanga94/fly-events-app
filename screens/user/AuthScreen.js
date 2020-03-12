@@ -54,7 +54,7 @@ const AuthScreen = props => {
     const [isSignUp, setIsSignUp] = useState(false);
     const dispatch = useDispatch();
 
-    const [formState, dispatchFormState] = useReducer(formReducer, {
+    const [logInFormState, dispatchlogInFormState] = useReducer(formReducer, {
         inputValues: {
             email: '',
             password: '',
@@ -66,17 +66,39 @@ const AuthScreen = props => {
         formIsValid: false
     });
 
+    const [signUpFormState, dispatchSignUpFormState] = useReducer(formReducer, {
+        inputValues: {
+            email: '',
+            password: '',
+            name: ''
+        },
+        inputValidities: {
+            email: false,
+            password: false,
+            name: false
+        },
+        formIsValid: false
+    });
+
     useEffect(() => {
         if (error) {
             Alert.alert('An error occurred!', error, [{ text: 'Okay' }]);
         }
     }, [error]);
 
-    const signUpHandler = async () => {
+    const authHandler = async () => {
+        if ((isSignUp && !signUpFormState.formIsValid) || (!isSignUp && !logInFormState.formIsValid)) {
+            Alert.alert('Wrong Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
+            return;
+        }
         setIsLoading(true);
         setError(null);
         try {
-            await dispatch(authActions.signUp(formState.inputValues.email, formState.inputValues.password));
+            if (isSignUp){
+                await dispatch(authActions.signUp(signUpFormState.inputValues.email, signUpFormState.inputValues.password, signUpFormState.inputValues.name));
+            } else {
+                await dispatch(authActions.logIn(logInFormState.inputValues.email, logInFormState.inputValues.password));
+            }  
             props.navigation.navigate('Events');
         } catch (err) {
             setError(err.message);
@@ -84,26 +106,24 @@ const AuthScreen = props => {
         }
     }
 
-    const logInHandler = async () => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            await dispatch(authActions.logIn(formState.inputValues.email, formState.inputValues.password));
-            props.navigation.navigate('Events');
-        } catch (err) {
-            setError(err.message)
-            setIsLoading(false);
-        }
-    }
-
     const inputChangeHandler = useCallback((inputLabel, value, validity) => {
-        dispatchFormState({
-            type: FORM_INPUT_UPDATE,
-            value,
-            isValid: validity,
-            inputLabel
-        })
-    }, [dispatchFormState]);
+        if (isSignUp) {
+            dispatchSignUpFormState({
+                type: FORM_INPUT_UPDATE,
+                value,
+                isValid: validity,
+                inputLabel
+            })
+        } else {
+            dispatchlogInFormState({
+                type: FORM_INPUT_UPDATE,
+                value,
+                isValid: validity,
+                inputLabel
+            })
+        } 
+    }, [dispatchlogInFormState, dispatchSignUpFormState, isSignUp]);
+
 
     return (
         <KeyboardAvoidingView
@@ -144,12 +164,25 @@ const AuthScreen = props => {
                             onInputChange={inputChangeHandler}
                             initialValue=""
                         />
+                        {
+                            isSignUp ?
+                                <Input
+                                    id="name"
+                                    label="Name:"
+                                    keyboardType="default"
+                                    required
+                                    minLength={3}
+                                    autoCapitalize="words"
+                                    errorText="Please enter a valid name."
+                                    onInputChange={inputChangeHandler}
+                                    initialValue=""
+                                /> :
+                                null
+                        }
                         <View style={styles.buttonContainer}>
                             {isLoading ?
                                 <Spinner /> :
-                                <Button title={isSignUp ? "SIGN UP" : "LOG IN"} color={Colors.primary} onPress={() => {
-                                    isSignUp ? signUpHandler() : logInHandler();
-                                }} />
+                                <Button title={isSignUp ? "SIGN UP" : "LOG IN"} color={Colors.primary} onPress={authHandler} />
                             }
                         </View>
                         <View style={styles.buttonContainer}>

@@ -10,7 +10,8 @@ import {
     StyleSheet,
     Alert,
     KeyboardAvoidingView,
-    Text
+    Text,
+    Picker
 } from 'react-native';
 import { DatePicker } from 'native-base';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -46,6 +47,13 @@ const formReducer = (state, action) => {
     }
     return state;
 }
+let timeRange = [''];
+for (let i = 1; i <= 12; i++){
+    timeRange.push(i + 'pm');
+}
+for (let i = 1; i <= 12; i++){
+    timeRange.push(i + 'am');
+}
 
 const EditEventScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
@@ -59,15 +67,18 @@ const EditEventScreen = props => {
             imageUrl: editingEvent ? editingEvent.imageUrl : '',
             price: '',
             description: editingEvent ? editingEvent.description : '',
-            date: editingEvent ? editingEvent.date : ''
+            date: editingEvent ? editingEvent.date : '',
+            startsAt: editingEvent ? editingEvent.startsAt : '',
+            endsAt: editingEvent ? editingEvent.endsAt : '',
         },
         inputValidities: {
             title: editingEvent ? true : false,
             imageUrl: editingEvent ? true : false,
             price: editingEvent ? true : false,
             description: editingEvent ? true : false,
-            date: editingEvent ? true : false
-
+            date: editingEvent ? true : false,
+            startsAt: editingEvent ? true : false,
+            endsAt: editingEvent ? true : false,
         },
         formIsValid: editingEvent ? true : false
     });
@@ -77,7 +88,7 @@ const EditEventScreen = props => {
     const submitHandler = useCallback(async () => {
         //console.log('Submitting...');
         if (!formState.formIsValid) {
-            Alert.alert('Wrong Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
+            Alert.alert('Wrong or Missing Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
             return;
         }
         setError(null);
@@ -98,6 +109,7 @@ const EditEventScreen = props => {
                         formState.inputValues.imageUrl,
                         +formState.inputValues.price,
                         formState.inputValues.date,
+                        `${formState.inputValues.startsAt} - ${formState.inputValues.endsAt}`,
                     ));
             props.navigation.goBack();
         } catch (err) {
@@ -202,6 +214,40 @@ const EditEventScreen = props => {
                         }}
                         disabled={false}
                     />
+                    <View style={styles.timeContainer}>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <Text style={styles.label}>Starts At:</Text>
+                            <Picker
+                                selectedValue={formState.inputValues.startsAt}
+                                style={{ height: 30, width: 100, color: Colors.accent }}
+                                onValueChange={(itemValue, itemIndex) => {
+                                    inputChangeHandler("startsAt", itemValue, true)
+                                }}
+                            >
+                                {
+                                    timeRange.map(time => {
+                                        return <Picker.Item label={time} value={time} key={time}/>
+                                    })
+                                }
+                            </Picker>
+                        </View>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <Text style={styles.label}>Ends At:</Text>
+                            <Picker
+                                selectedValue={formState.inputValues.endsAt}
+                                style={{ height: 30, width: 100, color: Colors.accent}}
+                                onValueChange={(itemValue, itemIndex) =>
+                                    inputChangeHandler("endsAt", itemValue, true)
+                                }
+                            >
+                                {
+                                    timeRange.map(time => {
+                                        return <Picker.Item label={time} value={time} key={time}/>
+                                    })
+                                }
+                            </Picker>
+                        </View>
+                    </View>
                 </View>
             </ScrollView>
         </KeyboardAvoidingView>
@@ -235,6 +281,10 @@ const styles = StyleSheet.create({
         fontFamily: 'open-sans-bold',
         marginVertical: 8
     },
+    timeContainer: {
+        flexDirection: 'row',
+        width: '100%'
+    }
 });
 
 export default EditEventScreen;

@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import {  
-  View, 
-  Text, 
-  FlatList, 
-  Button, 
+import React, { useEffect, useState, useCallback, Fragment } from 'react';
+import {
+  View,
+  Text,
+  FlatList,
+  Button,
   StyleSheet
 } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
@@ -16,17 +16,19 @@ import Colors from '../../constants/Colors';
 import * as eventActions from '../../store/actions/events';
 import Spinner from '../../components/UI/Spinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import SearchBar from '../../components/SearchBar';
 
 const EventsListScreen = props => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState();
+  const [ searchTerm, setSearchTerm ] = useState('');
+
   const events = useSelector(state => {
     return state.events.upComingEvents
   });
   const dispatch = useDispatch();
 
   const loadEvents = useCallback(async () => {
-    //console.log('LOAD PRODUCTS');
     setError(null);
     //setIsLoading(true);
     try {
@@ -51,12 +53,12 @@ const EventsListScreen = props => {
   }, [loadEvents]);
 
   const selectItemHandler = (id, title) => {
-    props.navigation.navigate('ProductDetail', { productId: id, productTitle: title });
+    props.navigation.navigate('EventDetails', { eventId: id, eventTitle: title });
   }
 
   if (isLoading) {
     return (
-      <Spinner/>
+      <Spinner />
     )
   }
 
@@ -77,39 +79,56 @@ const EventsListScreen = props => {
     )
   }
 
+  let filteredEvents;
+  if (searchTerm === ''){
+    filteredEvents = events;
+  } else {
+    filteredEvents = events.filter(event => event.title.toLowerCase().includes(searchTerm.toLowerCase()));
+  }
+
   return (
-    <FlatList
-      onRefresh={loadEvents}
-      refreshing={isLoading}
-      data={events}
-      keyExtractor={item => item.id}
-      renderItem={itemData => (
-        <EventItem
-          image={itemData.item.imageUri}
-          title={itemData.item.title}
-          price={itemData.item.price}
-          date={itemData.item.readableDate}
-          onSelect={() => {
-            selectItemHandler(itemData.item.id, itemData.item.title);
-          }}
-        >
-          <Button
-            title="View Details"
-            onPress={() => {
+    <Fragment>
+      <SearchBar
+        style={{marginHorizontal: 20, marginBottom: 5}}
+        placeholder="Search by Title"
+        onSearch={(text) => {
+          setSearchTerm(text);
+        }}
+      />
+      <FlatList
+        onRefresh={loadEvents}
+        refreshing={isLoading}
+        data={filteredEvents}
+        keyExtractor={item => item.id}
+        renderItem={itemData => (
+          <EventItem
+            image={itemData.item.imageUri}
+            title={itemData.item.title}
+            price={itemData.item.price}
+            date={itemData.item.readableDate}
+            onSelect={() => {
               selectItemHandler(itemData.item.id, itemData.item.title);
             }}
-            color={Colors.primary}
-          />
-          <Button
-            title="BUY TICKET"
-            onPress={() => {
-              dispatch(cartActions.addToCart(itemData.item));
-            }}
-            color={Colors.accent}
-          />
-        </EventItem>
-      )}
-    />
+          >
+            <Button
+              title="View Details"
+              onPress={() => {
+                selectItemHandler(itemData.item.id, itemData.item.title);
+              }}
+              color={Colors.primary}
+            />
+            <Button
+              title="ADD TO CART"
+              onPress={() => {
+                dispatch(cartActions.addToCart(itemData.item));
+              }}
+              color={Colors.accent}
+            />
+          </EventItem>
+        )}
+      />
+    </Fragment>
+
   );
 };
 
