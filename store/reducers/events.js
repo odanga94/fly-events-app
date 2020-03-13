@@ -29,7 +29,8 @@ export default (state = initialState, action) => {
                 action.eventData.imageUri,
                 action.eventData.price,
                 action.eventData.date,
-                action.eventData.eventTime
+                action.eventData.eventTime,
+                action.eventData.location
             )
             return {
                 ...state,

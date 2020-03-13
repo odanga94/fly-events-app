@@ -18,6 +18,7 @@ import UserEventsScreen from '../screens/user/UserEventsScreen';
 import EditEventScreen from '../screens/user/EditEventScreen';
 import AuthScreen from '../screens/user/AuthScreen';
 import StartUpScreen from '../screens/StartUpScreen';
+import PickLocationScreen from '../screens/PickLocationScreen';
 import Colors from '../constants/Colors';
 import * as authActions from '../store/actions/auth';
 
@@ -63,7 +64,8 @@ const OrdersNavigator = createStackNavigator(
 const MyEventsNavigator = createStackNavigator(
   {
     UserEvents: UserEventsScreen,
-    EditEvent: EditEventScreen
+    EditEvent: EditEventScreen,
+    PickLocation: PickLocationScreen
   },
   {
     navigationOptions: {

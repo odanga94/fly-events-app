@@ -11,7 +11,9 @@ import {
     Alert,
     KeyboardAvoidingView,
     Text,
-    Picker
+    Picker,
+    Button,
+    Dimensions
 } from 'react-native';
 import { DatePicker } from 'native-base';
 import { HeaderButtons, Item } from 'react-navigation-header-buttons';
@@ -22,7 +24,10 @@ import * as eventActions from '../../store/actions/events';
 import Input from '../../components/UI/Input';
 import Spinner from '../../components/UI/Spinner';
 import ErrorMessage from '../../components/ErrorMessage';
+import ListButton from '../../components/UI/ListButton';
 import Colors from '../../constants/Colors';
+
+const { width } = Dimensions.get('window');
 
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 const formReducer = (state, action) => {
@@ -59,7 +64,9 @@ const EditEventScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
     const prodId = props.navigation.getParam('productId');
+    const selectedLocationAddress = props.navigation.getParam('pickedLocation');
     const editingEvent = /*useSelector(state => state.products.userEvents.find(prod => prod.id === prodId));*/ null;
+
 
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
@@ -70,6 +77,7 @@ const EditEventScreen = props => {
             date: editingEvent ? editingEvent.date : '',
             startsAt: editingEvent ? editingEvent.startsAt : '',
             endsAt: editingEvent ? editingEvent.endsAt : '',
+            location: editingEvent ? editingEvent.location : '',
         },
         inputValidities: {
             title: editingEvent ? true : false,
@@ -79,6 +87,7 @@ const EditEventScreen = props => {
             date: editingEvent ? true : false,
             startsAt: editingEvent ? true : false,
             endsAt: editingEvent ? true : false,
+            location: editingEvent ? true : false
         },
         formIsValid: editingEvent ? true : false
     });
@@ -86,7 +95,7 @@ const EditEventScreen = props => {
     const dispatch = useDispatch();
 
     const submitHandler = useCallback(async () => {
-        //console.log('Submitting...');
+        //console.log('formState', formState);
         if (!formState.formIsValid) {
             Alert.alert('Wrong or Missing Input!', 'Please check the errors in the form.', [{ text: 'Okay' }]);
             return;
@@ -110,6 +119,7 @@ const EditEventScreen = props => {
                         +formState.inputValues.price,
                         formState.inputValues.date,
                         `${formState.inputValues.startsAt} - ${formState.inputValues.endsAt}`,
+                        formState.inputValues.location
                     ));
             props.navigation.goBack();
         } catch (err) {
@@ -118,9 +128,9 @@ const EditEventScreen = props => {
         setIsLoading(false);
     }, [dispatch, formState, prodId]);
 
-    useEffect(() => {
+    /*useEffect(() => {
         props.navigation.setParams({ 'submit': submitHandler });
-    }, [submitHandler]);
+    }, [submitHandler]);*/
 
     const inputChangeHandler = useCallback((inputLabel, value, validity) => {
         dispatchFormState({
@@ -131,6 +141,15 @@ const EditEventScreen = props => {
         })
     }, [dispatchFormState]);
 
+    const goToLocationHandler = () => {
+        props.navigation.navigate('PickLocation')
+    }
+
+    useEffect(() => {
+        if (selectedLocationAddress){
+            inputChangeHandler("location", selectedLocationAddress, true);
+        }
+    }, [selectedLocationAddress])    
 
     if (isLoading) {
         return <Spinner />
@@ -248,18 +267,26 @@ const EditEventScreen = props => {
                             </Picker>
                         </View>
                     </View>
+                    <Text style={styles.label}>Location:</Text>
+                    <ListButton 
+                        info={ selectedLocationAddress ? selectedLocationAddress : "Select Location"}
+                        pressed={goToLocationHandler} 
+                    />
                 </View>
             </ScrollView>
+            <View style={styles.buttonContainer}>
+                <Button color={Colors.accent} title="SAVE" onPress={submitHandler}/>
+            </View>
         </KeyboardAvoidingView>
     );
 
 }
 
 EditEventScreen.navigationOptions = navData => {
-    const submitFn = navData.navigation.getParam('submit');
+    //const submitFn = navData.navigation.getParam('submit');
     return {
         headerTitle: navData.navigation.getParam('productId') ? 'Edit Event' : 'Add Event',
-        headerRight: (
+        /*headerRight: (
             <HeaderButtons HeaderButtonComponent={HeaderButton} >
                 <Item
                     title='Save'
@@ -269,7 +296,7 @@ EditEventScreen.navigationOptions = navData => {
                     }}
                 />
             </HeaderButtons>
-        ),
+        ),*/
     }
 }
 
@@ -284,6 +311,11 @@ const styles = StyleSheet.create({
     timeContainer: {
         flexDirection: 'row',
         width: '100%'
+    },
+    buttonContainer: {
+        alignSelf: 'center',
+        margin: 20,
+        width: width / 4
     }
 });
 

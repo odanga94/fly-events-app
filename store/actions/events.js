@@ -27,14 +27,16 @@ export const fetchEvents = () => {
                     resData[key].imageUri,
                     resData[key].price,
                     resData[key].eventDate,
-                    resData[key].eventTime
+                    resData[key].eventTime,
+                    resData[key].location
                 );
             }) : [];
-            loadedEvents.sort((a, b) => a.eventDate > b.eventDate ? 1 : -1)
+            const upComingEvents = loadedEvents.filter(event => new Date().getTime() <= new Date(event.eventDate).getTime());
+            upComingEvents.sort((a, b) => a.eventDate > b.eventDate ? 1 : -1)
             //console.log(loadedProducts);
             dispatch({
                 type: SET_EVENTS,
-                events: loadedEvents,
+                events: upComingEvents,
                 userEvents: loadedEvents.filter(event => event.ownerId === userId)
             })
         } catch (err) {
@@ -62,7 +64,7 @@ export const deleteProduct = (productId) => {
     }
 }
 
-export const createEvent = (title, description, imageUri, price, date, eventTime) => {
+export const createEvent = (title, description, imageUri, price, date, eventTime, location) => {
     return async (dispatch, getState) => {
         // any async code you want!
         const { token, userId } = getState().auth;
@@ -78,7 +80,8 @@ export const createEvent = (title, description, imageUri, price, date, eventTime
                 price,
                 ownerId: userId,
                 eventDate: date,
-                eventTime
+                eventTime,
+                location
             })
         });
 
@@ -95,7 +98,8 @@ export const createEvent = (title, description, imageUri, price, date, eventTime
                 price,
                 ownerId: userId,
                 date,
-                eventTime
+                eventTime,
+                location
             }
         });
     }

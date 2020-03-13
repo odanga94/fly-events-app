@@ -8,7 +8,7 @@ import {
     Image,
     Dimensions
 } from 'react-native';
-import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Ionicons, Entypo } from '@expo/vector-icons';
 import { useSelector, useDispatch } from 'react-redux';
 
 import { BASE_URL } from '../../constants/base-url';
@@ -45,19 +45,25 @@ const EventDetailsScreen = props => {
             </View>
             <View style={styles.infoContainer}>
                 <Text style={styles.price}>KES. {selectedEvent.price.toFixed(2)}</Text>
-                <Card style={{flexDirection: 'row', width: '100%', marginVertical: 5, padding: 10}}>
-                    <View style={{ flex: 1, flexDirection: "row"}}>
-                        <MaterialCommunityIcons name="calendar" color={Colors.primary} size={23} />
-                        <Text style={{...styles.text, marginHorizontal: 5}}>{selectedEvent.readableDate}</Text>
+                <Card style={{ width: '100%', marginVertical: 5, padding: 10 }}>
+                    <View style={{ flexDirection: 'row' }}>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <MaterialCommunityIcons name="calendar" color={Colors.primary} size={23} />
+                            <Text style={{ ...styles.text, marginHorizontal: 5 }}>{selectedEvent.readableDate}</Text>
+                        </View>
+                        <View style={{ flex: 1, flexDirection: "row" }}>
+                            <Ionicons name="md-time" color={Colors.primary} size={23} />
+                            <Text style={{ ...styles.text, marginHorizontal: 5 }}>{selectedEvent.eventTime}</Text>
+                        </View>
                     </View>
-                    <View style={{ flex: 1, flexDirection: "row"}}>
-                        <Ionicons name="md-time" color={Colors.primary} size={23} />
-                        <Text style={{...styles.text, marginHorizontal: 5}}>{selectedEvent.eventTime}</Text>
+                    <View style={{ flexDirection: "row", maxWidth: '95%' }}>
+                        <Entypo name="location-pin" color={Colors.primary} size={23} />
+                        <Text style={{ ...styles.text, marginHorizontal: 5 }}>{selectedEvent.location}</Text>
                     </View>
                 </Card>
                 <Text style={styles.text}>posted by <Text style={{ ...styles.text, color: Colors.accent, fontWeight: 'bold' }}>{eventOwnerName}</Text></Text>
                 <Text style={styles.title}>ABOUT:</Text>
-                <ScrollView style={{maxHeight: height / 4}}>
+                <ScrollView style={{ maxHeight: height / 4 }}>
                     <Text style={styles.text}>{selectedEvent.description}</Text>
                 </ScrollView>
                 <View style={styles.action}>
