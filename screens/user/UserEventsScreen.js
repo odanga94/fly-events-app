@@ -6,21 +6,21 @@ import { HeaderButtons, Item } from 'react-navigation-header-buttons';
 import EventItem from '../../components/events/EventItem';
 import HeaderButton from '../../components/UI/HeaderButton';
 import Colors from '../../constants/Colors';
-import { deleteProduct } from '../../store/actions/events'
+import { deleteEvent } from '../../store/actions/events'
 
 const UserEventsScreen = props => {
     const userEvents = useSelector(state => state.events.userEvents);
     const dispatch = useDispatch();
 
-    const editProductHandler = (productId) => {
-        props.navigation.navigate('EditProduct', {productId: productId})
+    const editEventHandler = (eid) => {
+        props.navigation.navigate('EditEvent', { eventId: eid })
     }
 
-    const deleteHandler = (pid) => {
-        Alert.alert('Are you sure', 'Do you really want to delete this product?', [
+    const deleteHandler = (eid) => {
+        Alert.alert('Are you sure', 'Do you really want to delete this event?', [
             {text: 'No', style: 'default'},
             {text: 'Yes', style: 'destructive', onPress: () => {
-                dispatch(deleteProduct(pid));
+                dispatch(deleteEvent(eid));
             }}
         ])
     }
@@ -44,13 +44,13 @@ const UserEventsScreen = props => {
                     image={itemData.item.imageUri}
                     date={itemData.item.readableDate}
                     onSelect={() => {
-                        editProductHandler(itemData.item.id);
+                        editEventHandler(itemData.item.id);
                     }}
                 >
                     <Button
                         title="Edit"
                         onPress={() => {
-                            editProductHandler(itemData.item.id);
+                            editEventHandler(itemData.item.id);
                         }}
                         color={Colors.primary}
                     />

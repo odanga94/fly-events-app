@@ -1,5 +1,5 @@
 import Event from '../../models/event';
-import { CREATE_EVENT, SET_EVENTS } from '../actions/events';
+import { CREATE_EVENT, SET_EVENTS, DELETE_EVENT, UPDATE_EVENT } from '../actions/events';
 
 const initialState = {
     upComingEvents: [],
@@ -14,12 +14,12 @@ export default (state = initialState, action) => {
                 upComingEvents: action.events,
                 userEvents: action.userEvents
             }
-        /*case DELETE_PRODUCT:
+        case DELETE_EVENT:
             return {
                 ...state,
-                availableProducts: state.availableProducts.filter(availableProduct => availableProduct.id !== action.pid),
-                userProducts: state.userProducts.filter(userProduct => userProduct.id !== action.pid)
-            }*/
+                upComingEvents: state.upComingEvents.filter(upComingEvent => upComingEvent.id !== action.eid),
+                userEvents: state.userEvents.filter(userEvent => userEvent.id !== action.eid)
+            }
         case CREATE_EVENT:
             const newEvent = new Event(
                 action.eventData.id,
@@ -37,26 +37,29 @@ export default (state = initialState, action) => {
                 upComingEvents: state.upComingEvents.concat(newEvent),
                 userEvents: state.userEvents.concat(newEvent)
             }
-        /*case UPDATE_PRODUCT: 
-            const prodIndex = state.userProducts.findIndex(prod => prod.id === action.pid);
-            const updatedProduct = new Product(
-                action.pid, 
-                state.userProducts[prodIndex].ownerId,
-                action.productData.title,
-                action.productData.imageUrl,
-                action.productData.description,
-                state.userProducts[prodIndex].price
+        case UPDATE_EVENT: 
+            const eventIndex = state.userEvents.findIndex(event => event.id === action.eid);
+            const updatedEvent = new Event(
+                action.eid, 
+                state.userEvents[eventIndex].ownerId,
+                action.eventData.title,
+                action.eventData.description,
+                action.eventData.imageUri,
+                action.eventData.price,
+                action.eventData.date,
+                action.eventData.eventTime,
+                action.eventData.location
             );
-            const updatedUserProducts = [...state.userProducts];
-            updatedUserProducts[prodIndex] = updatedProduct;
-            const availableProdIndex = state.availableProducts.findIndex(prod => prod.id === action.pid);
-            const updatedAvailableProducts = [...state.availableProducts];
-            updatedAvailableProducts[availableProdIndex] = updatedProduct;
+            const updatedUserEvents = [...state.userEvents];
+            updatedUserEvents[eventIndex] = updatedEvent;
+            const upComingEventIndex = state.upComingEvents.findIndex(event => event.id === action.eid);
+            const updatedUpComingEvents = [...state.upComingEvents];
+            updatedUpComingEvents[upComingEventIndex] = updatedEvent;
             return {
                 ...state,
-                availableProducts: updatedAvailableProducts,
-                userProducts: updatedUserProducts
-            }*/
+                upComingEvents: updatedUpComingEvents,
+                userEvents: updatedUserEvents
+            }
         default: 
             return state;
     }

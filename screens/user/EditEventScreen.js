@@ -63,20 +63,19 @@ for (let i = 1; i <= 12; i++){
 const EditEventScreen = props => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
-    const prodId = props.navigation.getParam('productId');
+    const eventId = props.navigation.getParam('eventId');
     const selectedLocationAddress = props.navigation.getParam('pickedLocation');
-    const editingEvent = /*useSelector(state => state.products.userEvents.find(prod => prod.id === prodId));*/ null;
-
+    const editingEvent = useSelector(state => state.events.userEvents.find(event => event.id === eventId));
 
     const [formState, dispatchFormState] = useReducer(formReducer, {
         inputValues: {
             title: editingEvent ? editingEvent.title : '',
-            imageUrl: editingEvent ? editingEvent.imageUrl : '',
-            price: '',
+            imageUrl: editingEvent ? editingEvent.imageUri : '',
+            price: editingEvent ? editingEvent.price.toString() : '',
             description: editingEvent ? editingEvent.description : '',
-            date: editingEvent ? editingEvent.date : '',
-            startsAt: editingEvent ? editingEvent.startsAt : '',
-            endsAt: editingEvent ? editingEvent.endsAt : '',
+            date: editingEvent ? editingEvent.eventDate : '',
+            startsAt: editingEvent ? editingEvent.eventTime.split('-')[0].trim() : '',
+            endsAt: editingEvent ? editingEvent.eventTime.split('-')[1].trim() : '',
             location: editingEvent ? editingEvent.location : '',
         },
         inputValidities: {
@@ -106,10 +105,14 @@ const EditEventScreen = props => {
             editingEvent ?
                 await dispatch(
                     eventActions.updateEvent(
-                        prodId,
+                        eventId,
                         formState.inputValues.title,
                         formState.inputValues.description,
-                        formState.inputValues.imageUrl
+                        formState.inputValues.imageUrl,
+                        +formState.inputValues.price,
+                        formState.inputValues.date,
+                        `${formState.inputValues.startsAt} - ${formState.inputValues.endsAt}`,
+                        formState.inputValues.location
                     )) :
                 await dispatch(
                     eventActions.createEvent(
@@ -126,7 +129,7 @@ const EditEventScreen = props => {
             setError(err.message);
         }
         setIsLoading(false);
-    }, [dispatch, formState, prodId]);
+    }, [dispatch, formState, eventId]);
 
     /*useEffect(() => {
         props.navigation.setParams({ 'submit': submitHandler });
@@ -186,7 +189,7 @@ const EditEventScreen = props => {
                         autoCapitalize='sentences'
                         returnKeyType='next'
                         onInputChange={inputChangeHandler}
-                        initialValue={editingEvent ? editingEvent.imageUrl : ''}
+                        initialValue={editingEvent ? editingEvent.imageUri : ''}
                         initiallyValid={!!editingEvent}
                         required
                     />
@@ -198,6 +201,7 @@ const EditEventScreen = props => {
                         returnKeyType='next'
                         keyboardType='decimal-pad'
                         onInputChange={inputChangeHandler}
+                        initialValue={editingEvent ? editingEvent.price.toString() : ''}
                         required
                         min={0.1}
                     />
@@ -217,7 +221,7 @@ const EditEventScreen = props => {
                     />
                     <Text style={styles.label}>Date:</Text>
                     <DatePicker
-                        defaultDate={new Date()}
+                        defaultDate={editingEvent ? new Date(editingEvent.eventDate) : new Date()}
                         minimumDate={new Date()}
                         maximumDate={new Date(2020, 12, 31)}
                         locale={"en"}
@@ -225,7 +229,7 @@ const EditEventScreen = props => {
                         modalTransparent={false}
                         animationType={"fade"}
                         androidMode={"default"}
-                        placeHolderText="Select date"
+                        placeHolderText={editingEvent ? editingEvent.readableDate : "Select date"}
                         textStyle={{ color: Colors.accent }}
                         placeHolderTextStyle={{ color: "#505050" }}
                         onDateChange={(newDate) => {
@@ -269,7 +273,11 @@ const EditEventScreen = props => {
                     </View>
                     <Text style={styles.label}>Location:</Text>
                     <ListButton 
-                        info={ selectedLocationAddress ? selectedLocationAddress : "Select Location"}
+                        info={ 
+                            selectedLocationAddress ? selectedLocationAddress : 
+                            editingEvent ? editingEvent.location :
+                            "Select Location"
+                        }
                         pressed={goToLocationHandler} 
                     />
                 </View>
@@ -285,7 +293,7 @@ const EditEventScreen = props => {
 EditEventScreen.navigationOptions = navData => {
     //const submitFn = navData.navigation.getParam('submit');
     return {
-        headerTitle: navData.navigation.getParam('productId') ? 'Edit Event' : 'Add Event',
+        headerTitle: navData.navigation.getParam('eventId') ? 'Edit Event' : 'Add Event',
         /*headerRight: (
             <HeaderButtons HeaderButtonComponent={HeaderButton} >
                 <Item

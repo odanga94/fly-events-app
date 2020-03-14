@@ -46,10 +46,10 @@ export const fetchEvents = () => {
     }
 }
 
-export const deleteProduct = (productId) => {
+export const deleteEvent = (eventId) => {
     return async (dispatch, getState) => {
         const token = getState().auth.token;
-        const response = await fetch(`${BASE_URL}products/${productId}.json?auth=${token}`, {
+        const response = await fetch(`${BASE_URL}events/${eventId}.json?auth=${token}`, {
             method: 'DELETE',
         });
 
@@ -59,7 +59,7 @@ export const deleteProduct = (productId) => {
 
         dispatch({
             type: DELETE_EVENT,
-            pid: productId
+            eid: eventId
         });
     }
 }
@@ -105,11 +105,11 @@ export const createEvent = (title, description, imageUri, price, date, eventTime
     }
 }
 
-export const updateProduct = (id, title, description, imageUrl) => {
+export const updateEvent = (id, title, description, imageUri, price, date, eventTime, location) => {
     return async (dispatch, getState) => {
         // any async code you want!
         const token = getState().auth.token;
-        const response = await fetch(`${BASE_URL}products/${id}.json?auth=${token}`, {
+        const response = await fetch(`${BASE_URL}events/${id}.json?auth=${token}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
@@ -117,7 +117,11 @@ export const updateProduct = (id, title, description, imageUrl) => {
             body: JSON.stringify({
                 title,
                 description,
-                imageUrl,
+                imageUri,
+                price,
+                eventDate: date,
+                eventTime,
+                location
             })
         });
         //console.log(response);
@@ -128,11 +132,15 @@ export const updateProduct = (id, title, description, imageUrl) => {
 
         dispatch({
             type: UPDATE_EVENT,
-            pid: id,
-            productData: {
+            eid: id,
+            eventData: {
                 title,
                 description,
-                imageUrl,
+                imageUri,
+                price,
+                date,
+                eventTime,
+                location
             }
         });
     }
