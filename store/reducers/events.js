@@ -48,7 +48,8 @@ export default (state = initialState, action) => {
                 action.eventData.price,
                 action.eventData.date,
                 action.eventData.eventTime,
-                action.eventData.location
+                action.eventData.location,
+                {...state.upComingEvents[eventIndex].attendees}
             );
             const updatedUserEvents = [...state.userEvents];
             updatedUserEvents[eventIndex] = updatedEvent;

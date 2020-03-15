@@ -28,7 +28,8 @@ export const fetchEvents = () => {
                     resData[key].price,
                     resData[key].eventDate,
                     resData[key].eventTime,
-                    resData[key].location
+                    resData[key].location,
+                    resData[key].attendees
                 );
             }) : [];
             const upComingEvents = loadedEvents.filter(event => new Date().getTime() <= new Date(event.eventDate).getTime());

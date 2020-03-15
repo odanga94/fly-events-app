@@ -1,4 +1,5 @@
 import { BASE_URL } from '../../constants/base-url';
+import ENV from '../../env';
 import Order from '../../models/order';
 
 export const ADD_ORDER = 'ADD_ORDER';
@@ -52,13 +53,48 @@ export const addOrder = (cartItems, totalAmount) => {
                 date: date.toISOString()
             })
         });
-
         if(!response.ok){
             throw new Error('Something went wrong!');
         }
-
         const resData = await response.json();
-        console.log(resData);
+
+        const userEmailResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${ENV.googleApiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                idToken: token
+            })
+        });
+        if(!userEmailResponse.ok){
+            throw new Error('Something went wrong!');
+        }
+
+        const userEmailResponseData = await userEmailResponse.json();
+        const userEmail = userEmailResponseData.users[0].email;
+
+        const userNameResponse = await fetch(`${BASE_URL}users/${userId}.json`);
+        if(!userNameResponse.ok){
+            throw new Error('Something went wrong!');
+        }
+
+        const userNameResponseData = await userNameResponse.json();
+        const userName = userNameResponseData.userName;
+
+        await cartItems.forEach(async (cartItem) => {
+            await fetch(`${BASE_URL}events/${cartItem.eventId}/attendees/${userId}.json?auth=${token}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    userEmail,
+                    userName,
+                    noOfTickets: cartItem.quantity
+                })
+            })
+        })
         dispatch({
             type: ADD_ORDER,
             orderData: {

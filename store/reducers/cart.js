@@ -11,47 +11,47 @@ const initialState = {
 export default (state = initialState, action) => {
     switch(action.type){
         case ADD_TO_CART:
-            const addedProduct = action.product;
-            const prodPrice = addedProduct.price;
-            const prodTitle = addedProduct.title;
+            const addedEvent = action.event;
+            const eventPrice = addedEvent.price;
+            const eventTitle = addedEvent.title;
 
             let updatedOrNewCartItem;
 
-            if (state.items[addedProduct.id]){
+            if (state.items[addedEvent.id]){
                 // already have the item in the cart
                 updatedOrNewCartItem = new CartItem(
-                    state.items[addedProduct.id].quantity + 1,
-                    prodPrice,
-                    prodTitle,
-                    state.items[addedProduct.id].sum + prodPrice
+                    state.items[addedEvent.id].quantity + 1,
+                    eventPrice,
+                    eventTitle,
+                    state.items[addedEvent.id].sum + eventPrice
                 );
             } else {
-                updatedOrNewCartItem = new CartItem(1, prodPrice, prodTitle, prodPrice);
+                updatedOrNewCartItem = new CartItem(1, eventPrice, eventTitle, eventPrice);
             }
             return {
                 ...state,
                 items: {
                     ...state.items,
-                    [addedProduct.id]: updatedOrNewCartItem,
+                    [addedEvent.id]: updatedOrNewCartItem,
                 },
-                totalAmount: state.totalAmount + prodPrice
+                totalAmount: state.totalAmount + eventPrice
             }
         case REMOVE_FROM_CART:
-            const selectedCartItem = state.items[action.productId];
+            const selectedCartItem = state.items[action.eventId];
             const currentQty = selectedCartItem.quantity;
             let updatedCartItems;
             if (currentQty > 1){
                 //need to reduce it, not erase it
-                const updatedCartItem = new CartItem(currentQty - 1, selectedCartItem.productPrice, selectedCartItem.productTitle, selectedCartItem.sum - selectedCartItem.productPrice);
-                updatedCartItems = { ...state.items, [action.productId]: updatedCartItem }
+                const updatedCartItem = new CartItem(currentQty - 1, selectedCartItem.eventPrice, selectedCartItem.eventTitle, selectedCartItem.sum - selectedCartItem.eventPrice);
+                updatedCartItems = { ...state.items, [action.eventId]: updatedCartItem }
             } else {
                 updatedCartItems = { ...state.items }
-                delete updatedCartItems[action.productId];
+                delete updatedCartItems[action.eventId];
             }
             return {
                 ...state,
                 items: updatedCartItems,
-                totalAmount: state.totalAmount - selectedCartItem.productPrice
+                totalAmount: state.totalAmount - selectedCartItem.eventPrice
             }
         case ADD_ORDER:
             return initialState

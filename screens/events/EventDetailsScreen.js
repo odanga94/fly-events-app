@@ -15,6 +15,7 @@ import { BASE_URL } from '../../constants/base-url';
 import * as cartActions from '../../store/actions/cart';
 import Colors from '../../constants/Colors';
 import Card from '../../components/UI/Card'
+import ListButton from '../../components/UI/ListButton';
 
 const { height } = Dimensions.get('window');
 
@@ -63,9 +64,13 @@ const EventDetailsScreen = props => {
                 </Card>
                 <Text style={styles.text}>posted by <Text style={{ ...styles.text, color: Colors.accent, fontWeight: 'bold' }}>{eventOwnerName}</Text></Text>
                 <Text style={styles.title}>ABOUT:</Text>
-                <ScrollView style={{ maxHeight: height / 4 }}>
+                <ScrollView style={{ maxHeight: height / 4, marginBottom: 15 }}>
                     <Text style={styles.text}>{selectedEvent.description}</Text>
                 </ScrollView>
+                <ListButton
+                    info="View Attendees"
+                    pressed={() => props.navigation.navigate('Attendees', { selectedEvent })}
+                />
                 <View style={styles.action}>
                     <Button color={Colors.accent} title="Add to Cart" onPress={() => {
                         dispatch(cartActions.addToCart(selectedEvent))

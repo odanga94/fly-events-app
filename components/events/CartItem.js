@@ -5,16 +5,20 @@ import { Ionicons } from '@expo/vector-icons';
 const CartItem = props => {
     return (
         <View style={styles.cartItem}>
-            <View styles={styles.itemData}>
-                <Text style={styles.quantity}>{props.quantity} <Text style={styles.mainText}>{props.title}</Text></Text>
-
+            <View style={{flex: 2, justifyContent: 'space-between', flexDirection: 'row'}}>
+                <View styles={styles.itemData}>
+                    <Text style={styles.mainText}>{props.quantity}</Text>
+                </View>
+                <View style={{ ...styles.itemData, paddingHorizontal: 5 }}>
+                    <Text style={styles.mainText}>{props.title}</Text>
+                </View>
             </View>
-            <View style={styles.itemData}>
-                <Text style={styles.mainText}>${props.amount.toFixed(2)}</Text>
+            <View style={{...styles.itemData,paddingHorizontal: 5}}>
+                <Text style={styles.mainText}>KES. {props.amount.toFixed(2)}</Text>
                 {props.deletable && (
                     <TouchableOpacity onPress={props.onRemove} style={styles.deleteButton}>
                         <Ionicons name='ios-trash' size={23} color='red' />
-                    </TouchableOpacity>  
+                    </TouchableOpacity>
                 )}
             </View>
         </View>
@@ -24,26 +28,25 @@ const CartItem = props => {
 
 const styles = StyleSheet.create({
     cartItem: {
-        padding: 10,
-        backgroundColor: 'white',
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
-        marginHorizontal: 20
+        justifyContent: 'space-between',
+        marginBottom: 15,
+        padding: 10,
+        width: '100%',
+        borderBottomWidth: 1,
+        borderColor: '#ccc'
     },
     itemData: {
         flexDirection: 'row',
-        alignItems: 'center'
-    },
-    quantity: {
-        fontFamily: 'open-sans',
-        color: '#888',
-        fontSize: 16
+        alignItems: 'center',
+        flex: 1,
+        justifyContent: 'space-between',
     },
     mainText: {
         fontFamily: 'open-sans-bold',
         fontSize: 16,
-        color: 'black'
+        color: 'black',
     },
     deleteButton: {
         marginLeft: 20

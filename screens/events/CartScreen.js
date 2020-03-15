@@ -16,12 +16,12 @@ const CartScreen = props => {
         const transformedCartItems = [];
         for (const key in state.cart.items) {
             transformedCartItems.push({
-                productId: key,
+                eventId: key,
                 ...state.cart.items[key]
             })
         }
         //console.log(transformedCartItems);
-        return transformedCartItems.sort((a, b) => a.productId > b.productId ? 1 : -1);
+        return transformedCartItems.sort((a, b) => a.eventId > b.eventId ? 1 : -1);
     });
     const dispatch = useDispatch();
 
@@ -34,7 +34,7 @@ const CartScreen = props => {
     return (
         <View style={styles.screen}>
             <Card style={styles.summary}>
-                <Text style={styles.summaryText}>Total: <Text style={styles.amount}>${Math.round(cartTotalAmount.toFixed(2) * 100) / 100}</Text></Text>
+                <Text style={styles.summaryText}>Total: <Text style={styles.amount}>KES. {Math.round(cartTotalAmount.toFixed(2) * 100) / 100}</Text></Text>
                 {isLoading ? <Spinner /> :
                     <Button
                         disabled={cartItems.length === 0}
@@ -51,15 +51,15 @@ const CartScreen = props => {
                 renderItem={(itemData) => (
                     <CartItem
                         quantity={itemData.item.quantity}
-                        title={itemData.item.productTitle}
+                        title={itemData.item.eventTitle}
                         amount={itemData.item.sum}
                         deletable
                         onRemove={() => {
-                            dispatch(cartActions.removeFromCart(itemData.item.productId));
+                            dispatch(cartActions.removeFromCart(itemData.item.eventId));
                         }}
                     />
                 )}
-                keyExtractor={item => item.productId}
+                keyExtractor={item => item.eventId}
             />
         </View>
     )
