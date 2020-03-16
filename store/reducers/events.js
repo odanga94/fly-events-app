@@ -1,5 +1,5 @@
 import Event from '../../models/event';
-import { CREATE_EVENT, SET_EVENTS, DELETE_EVENT, UPDATE_EVENT } from '../actions/events';
+import { CREATE_EVENT, SET_EVENTS, DELETE_EVENT, UPDATE_EVENT, UPDATE_EVENT_ON_ADD_COMMENT } from '../actions/events';
 
 const initialState = {
     upComingEvents: [],
@@ -49,7 +49,8 @@ export default (state = initialState, action) => {
                 action.eventData.date,
                 action.eventData.eventTime,
                 action.eventData.location,
-                {...state.upComingEvents[eventIndex].attendees}
+                {...state.upComingEvents[eventIndex].attendees},
+                {...state.upComingEvents[eventIndex].comments}
             );
             const updatedUserEvents = [...state.userEvents];
             updatedUserEvents[eventIndex] = updatedEvent;
@@ -60,7 +61,7 @@ export default (state = initialState, action) => {
                 ...state,
                 upComingEvents: updatedUpComingEvents,
                 userEvents: updatedUserEvents
-            }
+            }      
         default: 
             return state;
     }

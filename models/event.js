@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 class Event {
-    constructor (id, ownerId, title, description, imageUri, price, eventDate, eventTime, location, attendees = {}) {
+    constructor (id, ownerId, title, description, imageUri, price, eventDate, eventTime, location, attendees = {}, comments = {}) {
         this.id = id;
         this.ownerId = ownerId
         this.title = title;
@@ -12,6 +12,7 @@ class Event {
         this.eventTime = eventTime;
         this.location = location
         this.attendees = attendees
+        this.comments = comments
     }
 
     get readableDate(){

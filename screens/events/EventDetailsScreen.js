@@ -71,6 +71,10 @@ const EventDetailsScreen = props => {
                     info="View Attendees"
                     pressed={() => props.navigation.navigate('Attendees', { selectedEvent })}
                 />
+                <ListButton
+                    info="View Comments"
+                    pressed={() => props.navigation.navigate('Comments', { eventId, /*comments: selectedEvent.comments*/ })}
+                />
                 <View style={styles.action}>
                     <Button color={Colors.accent} title="Add to Cart" onPress={() => {
                         dispatch(cartActions.addToCart(selectedEvent))

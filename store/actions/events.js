@@ -29,7 +29,8 @@ export const fetchEvents = () => {
                     resData[key].eventDate,
                     resData[key].eventTime,
                     resData[key].location,
-                    resData[key].attendees
+                    resData[key].attendees,
+                    resData[key].comments,
                 );
             }) : [];
             const upComingEvents = loadedEvents.filter(event => new Date().getTime() <= new Date(event.eventDate).getTime());
