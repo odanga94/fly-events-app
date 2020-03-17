@@ -19,63 +19,64 @@ import Card from '../../components/UI/Card';
 
 const { height } = Dimensions.get('window');
 
-const CommentsScreen = props => {
+const RepliesScreen = props => {
+    const commentId = props.navigation.getParam('commentId');
     const eventId = props.navigation.getParam('eventId');
-    //const comments = props.navigation.getParam('comments');
+    //const replies = props.navigation.getParam('replies');
 
-    const [commentsArray, setCommentsArray] = useState([]);
-    const [newComment, setNewComment] = useState('');
+    const [repliesArray, setRepliesArray] = useState([]);
+    const [newReply, setNewReply] = useState('');
     const [error, setError] = useState();
     const [isLoading, setIsLoading] = useState(false);
-    const [commentsLoading, setCommentsLoading] = useState(false);
-    const [commentsError, setCommentsError] = useState();
+    const [repliesLoading, setRepliesLoading] = useState(false);
+    const [repliesError, setRepliesError] = useState();
 
     const { userId, token } = useSelector(state => state.auth);
 
-    const fetchComments = useCallback(async () => {
+    const fetchReplies = useCallback(async () => {
         try {
-            setCommentsError(null);
-            setCommentsLoading(true);
-            const commentsResponse = await fetch(`${BASE_URL}events/${eventId}/comments.json`);
-            if (!commentsResponse.ok) {
-                //console.log(commentsResponse);
+            setRepliesError(null);
+            setRepliesLoading(true);
+            const repliesResponse = await fetch(`${BASE_URL}events/${eventId}/comments/${commentId}/replies.json`);
+            if (!repliesResponse.ok) {
+                //console.log(repliesResponse);
                 throw new Error('Something went wrong!');
             }
-            const commentsResponseData = await commentsResponse.json();
-            //console.log(commentsResponseData)
-            if (commentsResponseData !== null) {
-                const arr = Object.keys(commentsResponseData).map(key => {
+            const repliesResponseData = await repliesResponse.json();
+            //console.log(repliesResponseData)
+            if (repliesResponseData !== null) {
+                const arr = Object.keys(repliesResponseData).map(key => {
                     return {
-                        ...commentsResponseData[key],
-                        commentId: key
+                        ...repliesResponseData[key],
+                        replyId: key
                     }
                 });
                 arr.sort((a, b) => a.dateCreated > b.dateCreated ? - 1 : 1);
-                setCommentsArray(arr);
+                setRepliesArray(arr);
             }
-            setCommentsLoading(false);
+            setRepliesLoading(false);
         } catch (err) {
-            setCommentsError(err.message);
-            setCommentsLoading(false);
+            setRepliesError(err.message);
+            setRepliesLoading(false);
         }
 
-    }, [eventId]);
+    }, [commentId, eventId]);
 
     useEffect(() => {
-        fetchComments();
-    }, [fetchComments]);
+        fetchReplies();
+    }, [fetchReplies]);
 
     useEffect(() => {
         const WillFocusSub = props.navigation.addListener('willFocus', () => {
-            fetchComments();
+            fetchReplies();
         });
         return () => {
             WillFocusSub.remove();
         }
-    }, [fetchComments]);
+    }, [fetchReplies]);
 
 
-    const addCommentHandler = async () => {
+    const addReplyHandler = async () => {
         try {
             setError(null);
             setIsLoading(true);
@@ -87,7 +88,7 @@ const CommentsScreen = props => {
             const userNameResponseData = await userNameResponse.json();
             const userName = userNameResponseData.userName;
             const dateCreated = new Date().toISOString();
-            const response = await fetch(`${BASE_URL}events/${eventId}/comments/.json?auth=${token}`, {
+            const response = await fetch(`${BASE_URL}events/${eventId}/comments/${commentId}/replies.json?auth=${token}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -95,20 +96,20 @@ const CommentsScreen = props => {
                 body: JSON.stringify({
                     dateCreated,
                     userName,
-                    body: newComment
+                    body: newReply
                 })
             });
             const responseData = await response.json();
-            const updatedCommentsArray = commentsArray.concat({
+            const updatedRepliesArray = repliesArray.concat({
                 dateCreated,
-                body: newComment,
+                body: newReply,
                 userName,
-                commentId: responseData.name
+                replyId: responseData.name
             });
-            updatedCommentsArray.sort((a, b) => a.dateCreated > b.dateCreated ? -1 : 1);
-            setCommentsArray(updatedCommentsArray);
+            updatedRepliesArray.sort((a, b) => a.dateCreated > b.dateCreated ? -1 : 1);
+            setRepliesArray(updatedRepliesArray);
             setIsLoading(false);
-            setNewComment('');
+            setNewReply('');
         } catch (err) {
             setError(err.message);
             setIsLoading(false);
@@ -125,29 +126,14 @@ const CommentsScreen = props => {
     }
 
     const renderItem = ({ item }) => {
-        let noOfReplies = 0
-        let titleText = 'REPLIES';
-        if (item.replies){
-            noOfReplies = Object.keys(item.replies).length;
-            if (noOfReplies === 1){
-                titleText = 'REPLY'
-            }
-        }
         return (
             <Card style={styles.card}>
                 <View style={styles.summary}>
                     <Text style={styles.boldText}>{item.userName}</Text>
                     <Text style={styles.text}>{getReadableDate(item.dateCreated)}, {getTime(item.dateCreated)}</Text>
                 </View>
-                <View style={{ height: "40%" }}>
+                <View style={{ height: "60%" }}>
                     <Text style={styles.text}>{item.body}</Text>
-                </View>
-                <View style={styles.buttonContainer}>
-                    <Button
-                        color={Colors.accent}
-                        title={noOfReplies + ' ' + titleText}
-                        onPress={() => props.navigation.navigate('Replies', { eventId, commentId: item.commentId })}
-                    />
                 </View>
 
             </Card>
@@ -155,22 +141,23 @@ const CommentsScreen = props => {
     }
 
     let content;
-    if (commentsLoading) {
+    if (repliesLoading) {
         content = <Spinner />
-    } else if (commentsError) {
-        console.log(commentsError)
-        content = <Text style={{ fontFamily: 'open-sans-bold', fontSize: 18, textAlign: 'center' }}>Error getting comments. Try again later</Text>
-    } else if (!commentsArray.length) {
-        content = <Text style={{ fontFamily: 'open-sans-bold', fontSize: 18, textAlign: 'center' }}>No comments for this event yet!</Text>
+    } else if (repliesError) {
+        console.log(repliesError)
+        content = <Text style={{ fontFamily: 'open-sans-bold', fontSize: 18, textAlign: 'center' }}>Error getting replies. Try again later</Text>
+    } else if (!repliesArray.length) {
+        content = <Text style={{ fontFamily: 'open-sans-bold', fontSize: 18, textAlign: 'center' }}>No replies to this comment yet!</Text>
     } else {
         content = (
             <FlatList
-                data={commentsArray}
-                keyExtractor={item => item.commentId}
+                data={repliesArray}
+                keyExtractor={item => item.replyId}
                 renderItem={renderItem}
-                onRefresh={fetchComments}
-                refreshing={commentsLoading}
+                onRefresh={fetchReplies}
+                refreshing={repliesLoading}
                 contentContainerStyle={{ padding: 15, width: "100%", alignItems: "center" }}
+                style={{flex: 1}}
             />
         )
     }
@@ -184,24 +171,24 @@ const CommentsScreen = props => {
         >
             < View style={styles.contentContainer} >
                 {content}
-                <View style={styles.addCommentContainer}>
+                <View style={styles.addReplyContainer}>
                     <TextInput
                         style={styles.input}
                         numberOfLines={5}
-                        placeholder="Add Comment"
+                        placeholder="Add Reply"
                         textAlignVertical="top"
                         multiline={true}
-                        value={newComment}
-                        onChangeText={text => setNewComment(text)}
+                        value={newReply}
+                        onChangeText={text => setNewReply(text)}
                     />
                     <View style={styles.buttonContainer}>
                         {
                             isLoading ? <Spinner /> :
                                 <Button
-                                    title="Comment"
+                                    title="Reply"
                                     color={Colors.primary}
-                                    disabled={!newComment}
-                                    onPress={addCommentHandler}
+                                    disabled={!newReply}
+                                    onPress={addReplyHandler}
                                 />
                         }
 
@@ -213,10 +200,10 @@ const CommentsScreen = props => {
     )
 }
 
-CommentsScreen.navigationOptions = navData => {
-    //const numberOfComments = Object.keys(navData.navigation.getParam('comments').comments).length;
+RepliesScreen.navigationOptions = navData => {
+    //const numberOfReplies = Object.keys(navData.navigation.getParam('replies').replies).length;
     return {
-        headerTitle: `Comments` //(${numberOfComments})`
+        headerTitle: `Replies` //(${numberOfReplies})`
     };
 }
 
@@ -231,7 +218,7 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%"
     },
-    addCommentContainer: {
+    addReplyContainer: {
         position: "absolute",
         paddingVertical: 10,
         paddingHorizontal: 10,
@@ -278,8 +265,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         width: '90%',
         marginBottom: 5,
-        height: "30%"
+        height: "40%"
     },
 });
 
-export default CommentsScreen;
+export default RepliesScreen;

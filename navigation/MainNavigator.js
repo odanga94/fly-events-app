@@ -21,6 +21,7 @@ import StartUpScreen from '../screens/StartUpScreen';
 import PickLocationScreen from '../screens/PickLocationScreen';
 import AttendeesListScreen from '../screens/events/AttendeesListScreen';
 import CommentsScreen from '../screens/events/CommentsScreen';
+import RepliesScreen from '../screens/events/RepliesScreen';
 import Colors from '../constants/Colors';
 import * as authActions from '../store/actions/auth';
 
@@ -43,7 +44,8 @@ const EventsStackNavigator = createStackNavigator(
     EventDetails: EventDetailsScreen,
     Cart: CartScreen,
     Attendees: AttendeesListScreen,
-    Comments: CommentsScreen
+    Comments: CommentsScreen,
+    Replies: RepliesScreen
   },
   {
     navigationOptions: {
